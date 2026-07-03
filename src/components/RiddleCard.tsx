@@ -6,6 +6,7 @@ import { Button } from "./Button";
 import { Card } from "./Card";
 import { Input } from "./Input";
 import { SeedCluster } from "./SeedCluster";
+import { getAppCopy, type AppLanguage } from "../lib/i18n";
 
 type RiddleStatus = "solved" | "current" | "locked";
 
@@ -16,6 +17,7 @@ interface RiddleCardProps {
   feedback?: string;
   isIncorrect?: boolean;
   lockedMessage?: string;
+  language: AppLanguage;
   onAnswerChange: (value: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }
@@ -26,12 +28,16 @@ export function RiddleCard({
   answer,
   feedback,
   isIncorrect = false,
-  lockedMessage = "Solve the clue before this one to keep going.",
+  lockedMessage,
+  language,
   onAnswerChange,
   onSubmit,
 }: RiddleCardProps) {
+  const copy = getAppCopy(language);
   const isSolved = status === "solved";
   const isCurrent = status === "current";
+  const resolvedLockedMessage =
+    lockedMessage ?? copy.riddleCard.lockedMessage;
 
   return (
     <Card
@@ -73,7 +79,7 @@ export function RiddleCard({
               id={`riddle-${riddle.id}-heading`}
               className="font-semibold"
             >
-              Clue {riddle.order}
+              {copy.progress.clueLabel} {riddle.order}
             </h3>
             <p
               className={clsx(
@@ -85,7 +91,11 @@ export function RiddleCard({
                     : "text-brand-charcoal",
               )}
             >
-              {isSolved ? "Solved" : isCurrent ? "Current" : "Locked"}
+              {isSolved
+                ? copy.riddleCard.statusSolved
+                : isCurrent
+                  ? copy.riddleCard.statusCurrent
+                  : copy.riddleCard.statusLocked}
             </p>
           </div>
         </div>
@@ -93,7 +103,7 @@ export function RiddleCard({
         {isSolved ? (
           <div className="pt-7">
             <p className="text-lg font-medium leading-7">
-              {riddle.successMessage || "You got it. One step closer."}
+              {riddle.successMessage || copy.guest.defaultCorrect}
             </p>
           </div>
         ) : null}
@@ -105,10 +115,10 @@ export function RiddleCard({
             </p>
             <Input
               id={`answer-${riddle.id}`}
-              label="Your answer"
+              label={copy.riddleCard.answerLabel}
               value={answer}
               onChange={(event) => onAnswerChange(event.target.value)}
-              placeholder="Type your answer here"
+              placeholder={copy.riddleCard.answerPlaceholder}
               autoComplete="off"
               error={isIncorrect ? feedback : undefined}
               required
@@ -122,11 +132,11 @@ export function RiddleCard({
               </p>
             ) : null}
             <Button variant="accent" type="submit" className="mt-5 w-full">
-              Check my answer
+              {copy.riddleCard.submitButton}
             </Button>
             <p className="mt-4 flex items-center gap-2 text-xs text-brand-charcoal">
               <Lightbulb className="h-4 w-4" aria-hidden="true" />
-              Punctuation and capital letters won&apos;t trip you up.
+              {copy.riddleCard.punctuationHint}
             </p>
           </form>
         ) : null}
@@ -138,7 +148,7 @@ export function RiddleCard({
               aria-hidden="true"
             />
             <p className="max-w-[15rem] text-sm leading-6 text-brand-charcoal">
-              {lockedMessage}
+              {resolvedLockedMessage}
             </p>
           </div>
         ) : null}

@@ -3,6 +3,7 @@ import type {
   HostFormDraft,
   Riddle,
 } from "../types/dateExperience";
+import { getAppCopy, type ValidationCopy } from "./i18n";
 
 export type HostFormErrors = Record<string, string>;
 
@@ -72,34 +73,38 @@ export function isValidDateExperience(
   );
 }
 
-export function validateHostDraft(draft: HostFormDraft): HostFormErrors {
+const defaultValidationCopy: ValidationCopy = getAppCopy("en").validation;
+
+export function validateHostDraft(
+  draft: HostFormDraft,
+  copy: ValidationCopy = defaultValidationCopy,
+): HostFormErrors {
   const errors: HostFormErrors = {};
 
   if (!draft.title.trim()) {
-    errors.title = "Add a title for your mystery date.";
+    errors.title = copy.titleRequired;
   }
   if (!draft.teaser.trim()) {
-    errors.teaser = "Add a short teaser for your partner.";
+    errors.teaser = copy.teaserRequired;
   }
   if (!draft.scheduledAt) {
-    errors.scheduledAt = "Choose a date and time.";
+    errors.scheduledAt = copy.scheduledRequired;
   } else if (Number.isNaN(new Date(draft.scheduledAt).getTime())) {
-    errors.scheduledAt = "Choose a valid date and time.";
+    errors.scheduledAt = copy.scheduledInvalid;
   }
   if (!draft.finalSurpriseText.trim()) {
-    errors.finalSurpriseText = "Describe the final surprise.";
+    errors.finalSurpriseText = copy.finalSurpriseRequired;
   }
   if (draft.riddles.length !== 3) {
-    errors.riddles = "A mystery date needs exactly three clues.";
+    errors.riddles = copy.riddlesRequired;
   }
 
   draft.riddles.forEach((riddle, index) => {
     if (!riddle.prompt.trim()) {
-      errors[`riddles.${index}.prompt`] = `Add a prompt for clue ${index + 1}.`;
+      errors[`riddles.${index}.prompt`] = copy.riddlePromptRequired(index + 1);
     }
     if (!riddle.answer.trim()) {
-      errors[`riddles.${index}.answer`] =
-        `Add the correct answer for clue ${index + 1}.`;
+      errors[`riddles.${index}.answer`] = copy.riddleAnswerRequired(index + 1);
     }
   });
 

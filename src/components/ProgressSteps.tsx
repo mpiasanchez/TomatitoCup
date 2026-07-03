@@ -1,21 +1,28 @@
 import { Check, Heart, LockKeyhole } from "lucide-react";
 import clsx from "clsx";
 import type { GuestProgress } from "../types/dateExperience";
+import { getAppCopy, type AppLanguage } from "../lib/i18n";
 
 interface ProgressStepsProps {
   progress: GuestProgress;
+  language: AppLanguage;
 }
 
-export function ProgressSteps({ progress }: ProgressStepsProps) {
+export function ProgressSteps({
+  progress,
+  language,
+}: ProgressStepsProps) {
+  const copy = getAppCopy(language);
+
   const steps = [
-    { label: "Clue 1", index: 0 },
-    { label: "Clue 2", index: 1 },
-    { label: "Clue 3", index: 2 },
-    { label: "Surprise", index: 3 },
+    { label: `${copy.progress.clueLabel} 1`, index: 0 },
+    { label: `${copy.progress.clueLabel} 2`, index: 1 },
+    { label: `${copy.progress.clueLabel} 3`, index: 2 },
+    { label: copy.progress.surpriseLabel, index: 3 },
   ];
 
   return (
-    <nav aria-label="Mystery date progress">
+    <nav aria-label={copy.progress.navLabel}>
       <ol className="grid grid-cols-2 overflow-hidden rounded-cozy border border-brand-carbon/10 bg-brand-floral shadow-card sm:grid-cols-4">
         {steps.map((step, stepIndex) => {
           const isFinalStep = stepIndex === 3;
@@ -27,10 +34,10 @@ export function ProgressSteps({ progress }: ProgressStepsProps) {
             ((isFinalStep && progress.solvedRiddleIds.length === 3) ||
               progress.currentRiddleIndex === stepIndex);
           const status = isComplete
-            ? "Completed"
+            ? copy.progress.statusComplete
             : isCurrent
-              ? "Current"
-              : "Locked";
+              ? copy.progress.statusCurrent
+              : copy.progress.statusLocked;
           const Icon = isComplete
             ? isFinalStep
               ? Heart

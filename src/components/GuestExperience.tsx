@@ -15,16 +15,24 @@ import { LockedSurpriseCard } from "./LockedSurpriseCard";
 import { ProgressSteps } from "./ProgressSteps";
 import { RiddleCard } from "./RiddleCard";
 import { SeedCluster } from "./SeedCluster";
+import {
+  getAppCopy,
+  getLocale,
+  type AppLanguage,
+} from "../lib/i18n";
+import { LanguageToggle } from "./LanguageToggle";
 
 interface GuestExperienceProps {
   experience: DateExperience;
   persistProgress?: boolean;
   onBack?: () => void;
   backLabel?: string;
+  language: AppLanguage;
+  onLanguageChange: (language: AppLanguage) => void;
 }
 
-function formatDate(value: string): string {
-  return new Intl.DateTimeFormat(undefined, {
+function formatDate(value: string, language: AppLanguage): string {
+  return new Intl.DateTimeFormat(getLocale(language), {
     weekday: "short",
     month: "short",
     day: "numeric",
@@ -63,8 +71,11 @@ export function GuestExperience({
   experience,
   persistProgress = true,
   onBack,
-  backLabel = "Back to creator",
+  backLabel,
+  language,
+  onLanguageChange,
 }: GuestExperienceProps) {
+  const copy = getAppCopy(language);
   const [progress, setProgress] = useState(() =>
     loadProgress(experience, persistProgress),
   );
@@ -102,13 +113,13 @@ export function GuestExperience({
 
     if (!answer.trim()) {
       setIsIncorrect(true);
-      setFeedback("Enter your best guess first.");
+      setFeedback(copy.guest.emptyAnswer);
       return;
     }
 
     if (!isAnswerCorrect(answer, currentRiddle.answer)) {
       setIsIncorrect(true);
-      setFeedback("Not quite. Try again — the mystery is still safe.");
+      setFeedback(copy.guest.wrongAnswer);
       return;
     }
 
@@ -123,35 +134,41 @@ export function GuestExperience({
     setIsIncorrect(false);
     setFeedback(
       nextProgress.isFinalUnlocked
-        ? "All three clues solved. The surprise is unlocked."
-        : currentRiddle.successMessage || "You got it. One step closer.",
+        ? copy.guest.allSolved
+        : currentRiddle.successMessage || copy.guest.defaultCorrect,
     );
   }
 
   return (
     <div className="min-h-screen bg-brand-floral text-brand-carbon">
       <a className="skip-link" href="#guest-main">
-        Skip to the mystery
+        {copy.guest.skipToMystery}
       </a>
       <header className="border-b border-brand-carbon/10">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <Brand />
-          {onBack ? (
-            <button
-              type="button"
-              onClick={onBack}
-              className="min-h-11 rounded-lg px-3 text-sm font-semibold text-brand-charcoal hover:text-brand-carbon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-watermelon focus-visible:ring-offset-2 focus-visible:ring-offset-brand-floral"
-            >
-              {backLabel}
-            </button>
-          ) : (
-            <a
-              href="/"
-              className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-semibold text-brand-charcoal hover:text-brand-carbon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-watermelon focus-visible:ring-offset-2 focus-visible:ring-offset-brand-floral"
-            >
-              Create your own
-            </a>
-          )}
+        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-8">
+          <Brand language={language} />
+          <div className="flex items-center gap-2 sm:gap-3">
+            <LanguageToggle
+              language={language}
+              onChange={onLanguageChange}
+            />
+            {onBack ? (
+              <button
+                type="button"
+                onClick={onBack}
+                className="min-h-11 rounded-lg px-3 text-sm font-semibold text-brand-charcoal hover:text-brand-carbon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-watermelon focus-visible:ring-offset-2 focus-visible:ring-offset-brand-floral"
+              >
+                {backLabel ?? copy.common.backToCreator}
+              </button>
+            ) : (
+              <a
+                href="/"
+                className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-semibold text-brand-charcoal hover:text-brand-carbon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-watermelon focus-visible:ring-offset-2 focus-visible:ring-offset-brand-floral"
+              >
+                {copy.common.createYours}
+              </a>
+            )}
+          </div>
         </div>
       </header>
 
@@ -161,7 +178,7 @@ export function GuestExperience({
       >
         <section className="relative mx-auto max-w-3xl text-center">
           <p className="text-sm font-semibold text-brand-watermelonDark sm:text-base">
-            A surprise is waiting for you.
+            {copy.guest.introKicker}
           </p>
           <h1 className="mt-3 text-4xl font-bold tracking-tight text-brand-carbon sm:text-5xl">
             {experience.title}
@@ -172,12 +189,12 @@ export function GuestExperience({
           <div className="mt-6 flex flex-col items-center justify-center gap-2 text-sm text-brand-charcoal sm:flex-row sm:gap-5">
             <span className="inline-flex items-center gap-2">
               <CalendarDays className="h-4 w-4" aria-hidden="true" />
-              {formatDate(experience.scheduledAt)}
+              {formatDate(experience.scheduledAt, language)}
             </span>
             {experience.startingLocation ? (
               <span className="inline-flex items-center gap-2">
                 <MapPin className="h-4 w-4" aria-hidden="true" />
-                Start at {experience.startingLocation}
+                {copy.guest.startsAt} {experience.startingLocation}
               </span>
             ) : null}
           </div>
@@ -185,7 +202,7 @@ export function GuestExperience({
         </section>
 
         <div className="mt-9">
-          <ProgressSteps progress={progress} />
+          <ProgressSteps progress={progress} language={language} />
         </div>
 
         <div
@@ -201,13 +218,14 @@ export function GuestExperience({
             <LockedSurpriseCard
               experience={experience}
               progress={progress}
+              language={language}
             />
           </div>
         ) : (
           <>
             <section
               className="mt-6 grid gap-4 md:grid-cols-3"
-              aria-label="Mystery clues"
+              aria-label={copy.guest.riddleGridLabel}
             >
               {experience.riddles.map((riddle, index) => {
                 const isSolved = progress.solvedRiddleIds.includes(riddle.id);
@@ -227,9 +245,10 @@ export function GuestExperience({
                     isIncorrect={status === "current" && isIncorrect}
                     lockedMessage={
                       index === 2 && progress.currentRiddleIndex === 1
-                        ? "Only one more clue stands between you and the surprise."
+                        ? copy.guest.oneClueLeft
                         : undefined
                     }
+                    language={language}
                     onAnswerChange={setAnswer}
                     onSubmit={handleSubmit}
                   />
@@ -240,6 +259,7 @@ export function GuestExperience({
               <LockedSurpriseCard
                 experience={experience}
                 progress={progress}
+                language={language}
               />
             </div>
           </>

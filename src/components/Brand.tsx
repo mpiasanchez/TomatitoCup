@@ -1,11 +1,18 @@
 import { Heart } from "lucide-react";
 import clsx from "clsx";
+import { getAppCopy, type AppLanguage } from "../lib/i18n";
 
 interface BrandProps {
   inverted?: boolean;
+  language?: AppLanguage;
 }
 
-export function Brand({ inverted = false }: BrandProps) {
+export function Brand({
+  inverted = false,
+  language = "en",
+}: BrandProps) {
+  const copy = getAppCopy(language);
+
   return (
     <a
       href="/"
@@ -16,13 +23,13 @@ export function Brand({ inverted = false }: BrandProps) {
           ? "text-brand-floral focus-visible:ring-offset-brand-carbon"
           : "text-brand-carbon focus-visible:ring-offset-brand-floral",
       )}
-      aria-label="Mystery Date home"
+      aria-label={copy.brand.ariaLabel}
     >
       <Heart
         className="h-5 w-5 fill-brand-watermelon text-brand-watermelon"
         aria-hidden="true"
       />
-      Mystery Date
+      {copy.brand.name}
     </a>
   );
 }
