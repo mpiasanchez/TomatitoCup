@@ -30,6 +30,7 @@ export function LanguageToggle({
             : "text-brand-charcoal hover:text-brand-carbon",
         )}
         aria-pressed={language === "es"}
+        aria-label={copy.common.languageSpanish}
       >
         ES
       </button>
@@ -44,6 +45,7 @@ export function LanguageToggle({
             : "text-brand-charcoal hover:text-brand-carbon",
         )}
         aria-pressed={language === "en"}
+        aria-label={copy.common.languageEnglish}
       >
         EN
       </button>
