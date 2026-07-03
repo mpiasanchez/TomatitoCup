@@ -22,14 +22,22 @@ import {
   validateHostDraft,
   type HostFormErrors,
 } from "../lib/validation";
+import {
+  getAppCopy,
+  getLocale,
+  type AppLanguage,
+} from "../lib/i18n";
 import { Brand } from "../components/Brand";
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
+import { LanguageToggle } from "../components/LanguageToggle";
 import { SeedCluster } from "../components/SeedCluster";
 import { Textarea } from "../components/Textarea";
 
 interface HostDashboardProps {
   onPreview: (experience: DateExperience) => void;
+  language: AppLanguage;
+  onLanguageChange: (language: AppLanguage) => void;
 }
 
 const EMPTY_DRAFT: HostFormDraft = {
@@ -45,14 +53,6 @@ const EMPTY_DRAFT: HostFormDraft = {
     { prompt: "", answer: "", successMessage: "" },
   ],
 };
-
-const sectionLinks = [
-  { href: "#date-details", label: "Date details", number: 1 },
-  { href: "#final-reveal", label: "The final reveal", number: 2 },
-  { href: "#clue-1", label: "Clue 1", number: 3 },
-  { href: "#clue-2", label: "Clue 2", number: 4 },
-  { href: "#clue-3", label: "Clue 3", number: 5 },
-];
 
 function optionalValue(value: string): string | undefined {
   return value.trim() || undefined;
@@ -85,18 +85,22 @@ function buildExperience(
   };
 }
 
-function formatDraftDate(value: string): string {
+function formatDraftDate(
+  value: string,
+  language: AppLanguage,
+  fallback: string,
+): string {
   if (!value) {
-    return "Not scheduled yet";
+    return fallback;
   }
 
   const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) {
-    return "Not scheduled yet";
+    return fallback;
   }
 
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat(getLocale(language), {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -122,7 +126,20 @@ async function copyToClipboard(value: string): Promise<boolean> {
   }
 }
 
-export function HostDashboard({ onPreview }: HostDashboardProps) {
+export function HostDashboard({
+  onPreview,
+  language,
+  onLanguageChange,
+}: HostDashboardProps) {
+  const copy = getAppCopy(language);
+  const sectionLinks = [
+    { href: "#date-details", label: copy.host.sectionDateDetails, number: 1 },
+    { href: "#final-reveal", label: copy.host.sectionFinalReveal, number: 2 },
+    { href: "#clue-1", label: `${copy.host.sectionClue} 1`, number: 3 },
+    { href: "#clue-2", label: `${copy.host.sectionClue} 2`, number: 4 },
+    { href: "#clue-3", label: `${copy.host.sectionClue} 3`, number: 5 },
+  ];
+
   const [draft, setDraft] = useState<HostFormDraft>(EMPTY_DRAFT);
   const [errors, setErrors] = useState<HostFormErrors>({});
   const [generatedLink, setGeneratedLink] = useState("");
@@ -140,7 +157,7 @@ export function HostDashboard({ onPreview }: HostDashboardProps) {
     if (generatedLink) {
       setGeneratedLink("");
       setStatusMessage(
-        "Your details changed. Generate a fresh share link when you're ready.",
+        copy.host.statusDetailsChanged,
       );
     }
     setErrors((current) => {
@@ -165,7 +182,7 @@ export function HostDashboard({ onPreview }: HostDashboardProps) {
     if (generatedLink) {
       setGeneratedLink("");
       setStatusMessage(
-        "Your details changed. Generate a fresh share link when you're ready.",
+        copy.host.statusDetailsChanged,
       );
     }
     setErrors((current) => {
@@ -176,11 +193,11 @@ export function HostDashboard({ onPreview }: HostDashboardProps) {
   }
 
   function validateAndBuild(): DateExperience | null {
-    const nextErrors = validateHostDraft(draft);
+    const nextErrors = validateHostDraft(draft, copy.validation);
     setErrors(nextErrors);
 
     if (Object.keys(nextErrors).length > 0) {
-      setStatusMessage("Please fix the highlighted fields.");
+      setStatusMessage(copy.host.statusFixFields);
       window.requestAnimationFrame(() => errorSummaryRef.current?.focus());
       return null;
     }
@@ -210,7 +227,7 @@ export function HostDashboard({ onPreview }: HostDashboardProps) {
     saveHostDate(experience);
     setLastExperience(experience);
     setGeneratedLink(link);
-    setStatusMessage("Share link generated and saved on this device.");
+    setStatusMessage(copy.host.statusGenerated);
   }
 
   async function handleCopy() {
@@ -221,8 +238,8 @@ export function HostDashboard({ onPreview }: HostDashboardProps) {
     const copied = await copyToClipboard(generatedLink);
     setStatusMessage(
       copied
-        ? "Share link copied to your clipboard."
-        : "Copy failed. Select the link and copy it manually.",
+        ? copy.host.statusCopied
+        : copy.host.statusCopyFailed,
     );
   }
 
@@ -231,7 +248,7 @@ export function HostDashboard({ onPreview }: HostDashboardProps) {
     setErrors({});
     setGeneratedLink("");
     setLastExperience(undefined);
-    setStatusMessage("Form reset. Ready for a new mystery.");
+    setStatusMessage(copy.host.statusReset);
     document.getElementById("date-title")?.focus();
   }
 
@@ -246,25 +263,25 @@ export function HostDashboard({ onPreview }: HostDashboardProps) {
   return (
     <div className="min-h-screen bg-brand-floral text-brand-carbon">
       <a className="skip-link" href="#host-form">
-        Skip to date form
+        {copy.host.skipToForm}
       </a>
       <div className="mx-auto min-h-screen w-full max-w-[1536px] lg:grid lg:grid-cols-[348px_1fr]">
         <aside className="relative hidden overflow-hidden border-r border-brand-carbon/10 bg-brand-ash/20 p-8 lg:flex lg:flex-col">
-          <Brand />
+          <Brand language={language} />
           <div className="mt-12">
             <span
               className="mb-7 block h-0.5 w-10 bg-brand-watermelon"
               aria-hidden="true"
             />
             <h1 className="text-3xl font-bold tracking-tight">
-              Create a mystery date
+              {copy.host.createTitle}
             </h1>
             <p className="mt-3 leading-7 text-brand-charcoal">
-              Hide the surprise behind three playful clues.
+              {copy.host.createSubtitle}
             </p>
           </div>
 
-          <nav className="mt-8" aria-label="Form sections">
+          <nav className="mt-8" aria-label={copy.host.navLabel}>
             <ol className="space-y-1">
               {sectionLinks.map((link) => (
                 <li key={link.href}>
@@ -290,33 +307,33 @@ export function HostDashboard({ onPreview }: HostDashboardProps) {
 
           <div className="mt-8 border-y border-brand-carbon/10 py-6">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-charcoal">
-              Your mystery date
+              {copy.host.summaryTitle}
             </p>
             <dl className="mt-4 space-y-4 text-sm">
               <div className="flex gap-3">
                 <CalendarDays className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
                 <div>
-                  <dt className="font-semibold">Scheduled</dt>
+                  <dt className="font-semibold">{copy.host.summaryScheduled}</dt>
                   <dd className="mt-0.5 text-brand-charcoal">
-                    {formatDraftDate(draft.scheduledAt)}
+                    {formatDraftDate(draft.scheduledAt, language, copy.host.notScheduled)}
                   </dd>
                 </div>
               </div>
               <div className="flex gap-3">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
                 <div>
-                  <dt className="font-semibold">Starting location</dt>
+                  <dt className="font-semibold">{copy.host.summaryStartingLocation}</dt>
                   <dd className="mt-0.5 text-brand-charcoal">
-                    {draft.startingLocation || "Not set"}
+                    {draft.startingLocation || copy.host.notSet}
                   </dd>
                 </div>
               </div>
               <div className="flex gap-3">
                 <Gift className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
                 <div>
-                  <dt className="font-semibold">Required details</dt>
+                  <dt className="font-semibold">{copy.host.summaryRequiredDetails}</dt>
                   <dd className="mt-0.5 text-brand-charcoal">
-                    {completedRequiredFields} of 10 ready
+                    {completedRequiredFields} / 10 {copy.host.requiredReady}
                   </dd>
                 </div>
               </div>
@@ -324,14 +341,14 @@ export function HostDashboard({ onPreview }: HostDashboardProps) {
           </div>
 
           <div className="mt-6">
-            <p className="text-sm font-semibold">Share link</p>
+            <p className="text-sm font-semibold">{copy.host.shareLinkTitle}</p>
             <p className="mt-1 text-xs leading-5 text-brand-charcoal">
-              Generate a link to send the mystery with your guest.
+              {copy.host.shareLinkSubtitle}
             </p>
             <div className="mt-3 flex min-h-11 items-center gap-2 rounded-xl border border-brand-charcoal/25 bg-brand-floral/70 px-3 text-xs text-brand-charcoal">
               <Link2 className="h-4 w-4 shrink-0" aria-hidden="true" />
               <span className="truncate">
-                {generatedLink || "No link generated yet"}
+                {generatedLink || copy.host.noLinkYet}
               </span>
             </div>
           </div>
@@ -342,40 +359,44 @@ export function HostDashboard({ onPreview }: HostDashboardProps) {
           <header className="border-b border-brand-carbon/10 bg-brand-floral/95">
             <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-4 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
               <div className="lg:hidden">
-                <Brand />
+                <Brand language={language} />
                 <p className="mt-2 text-sm text-brand-charcoal">
-                  Hide the surprise behind three playful clues.
+                  {copy.host.createSubtitle}
                 </p>
               </div>
               <div className="hidden lg:block">
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-charcoal">
-                  Mystery builder
+                  {copy.host.mobileBuilderTitle}
                 </p>
                 <p className="mt-1 text-sm text-brand-charcoal">
-                  Your date is saved when you generate its link.
+                  {copy.host.mobileBuilderSubtitle}
                 </p>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <LanguageToggle
+                  language={language}
+                  onChange={onLanguageChange}
+                />
                 <Button
                   variant="secondary"
                   icon={<Eye className="h-4 w-4" aria-hidden="true" />}
                   onClick={handlePreview}
                 >
-                  Preview experience
+                  {copy.host.buttonPreviewExperience}
                 </Button>
                 <Button
                   type="submit"
                   form="host-form"
                   icon={<Link2 className="h-4 w-4" aria-hidden="true" />}
                 >
-                  Generate share link
+                  {copy.host.buttonGenerateShareLink}
                 </Button>
                 <Button
                   variant="danger"
                   icon={<RotateCcw className="h-4 w-4" aria-hidden="true" />}
                   onClick={handleReset}
                 >
-                  Reset
+                  {copy.host.buttonReset}
                 </Button>
               </div>
             </div>
@@ -384,7 +405,7 @@ export function HostDashboard({ onPreview }: HostDashboardProps) {
           <main className="mx-auto w-full max-w-6xl px-4 py-7 sm:px-6 lg:px-8">
             <div className="mb-7 lg:hidden">
               <h1 className="text-3xl font-bold tracking-tight">
-                Create a mystery date
+                {copy.host.createTitle}
               </h1>
             </div>
 
@@ -396,9 +417,9 @@ export function HostDashboard({ onPreview }: HostDashboardProps) {
                 aria-live="assertive"
                 tabIndex={-1}
               >
-                <h2 className="font-semibold">A few details need your attention.</h2>
+                <h2 className="font-semibold">{copy.host.errorSummaryTitle}</h2>
                 <p className="mt-1 text-sm text-brand-charcoal">
-                  Check the highlighted fields below, then try again.
+                  {copy.host.errorSummaryText}
                 </p>
               </div>
             ) : null}
@@ -417,30 +438,30 @@ export function HostDashboard({ onPreview }: HostDashboardProps) {
                     id="date-details-heading"
                     className="text-2xl font-semibold tracking-tight"
                   >
-                    Date details
+                    {copy.host.sectionDateDetails}
                   </h2>
                 </div>
                 <div className="grid gap-5 md:grid-cols-2">
                   <Input
                     id="date-title"
-                    label="Date title"
+                    label={copy.host.fieldDateTitle}
                     value={draft.title}
                     onChange={(event) =>
                       updateField("title", event.target.value)
                     }
-                    placeholder="A night to remember"
+                    placeholder={copy.host.placeholderDateTitle}
                     error={errors.title}
                     maxLength={80}
                     required
                   />
                   <Textarea
                     id="date-teaser"
-                    label="Date teaser"
+                    label={copy.host.fieldDateTeaser}
                     value={draft.teaser}
                     onChange={(event) =>
                       updateField("teaser", event.target.value)
                     }
-                    placeholder="Get ready for a surprise made just for you…"
+                    placeholder={copy.host.placeholderDateTeaser}
                     error={errors.teaser}
                     maxLength={180}
                     rows={2}
@@ -448,7 +469,7 @@ export function HostDashboard({ onPreview }: HostDashboardProps) {
                   />
                   <Input
                     id="scheduled-at"
-                    label="Scheduled date and time"
+                    label={copy.host.fieldScheduledAt}
                     type="datetime-local"
                     value={draft.scheduledAt}
                     onInput={(event) =>
@@ -459,12 +480,12 @@ export function HostDashboard({ onPreview }: HostDashboardProps) {
                   />
                   <Input
                     id="starting-location"
-                    label="Starting location (optional)"
+                    label={copy.host.fieldStartingLocation}
                     value={draft.startingLocation}
                     onChange={(event) =>
                       updateField("startingLocation", event.target.value)
                     }
-                    placeholder="Our apartment, the main entrance…"
+                    placeholder={copy.host.placeholderStartingLocation}
                     maxLength={140}
                   />
                 </div>
@@ -483,18 +504,18 @@ export function HostDashboard({ onPreview }: HostDashboardProps) {
                     id="final-reveal-form-heading"
                     className="text-2xl font-semibold tracking-tight"
                   >
-                    The final reveal
+                    {copy.host.sectionFinalReveal}
                   </h2>
                 </div>
                 <div className="grid gap-5 md:grid-cols-2">
                   <Textarea
                     id="final-surprise"
-                    label="Final surprise"
+                    label={copy.host.fieldFinalSurprise}
                     value={draft.finalSurpriseText}
                     onChange={(event) =>
                       updateField("finalSurpriseText", event.target.value)
                     }
-                    placeholder="Rooftop dinner, a concert, a weekend getaway…"
+                    placeholder={copy.host.placeholderFinalSurprise}
                     error={errors.finalSurpriseText}
                     maxLength={300}
                     rows={2}
@@ -502,12 +523,12 @@ export function HostDashboard({ onPreview }: HostDashboardProps) {
                   />
                   <Input
                     id="final-location"
-                    label="Final location (optional)"
+                    label={copy.host.fieldFinalLocation}
                     value={draft.finalSurpriseLocation}
                     onChange={(event) =>
                       updateField("finalSurpriseLocation", event.target.value)
                     }
-                    placeholder="Seaside Bistro, The Music Hall…"
+                    placeholder={copy.host.placeholderFinalLocation}
                     maxLength={140}
                   />
                 </div>
@@ -528,21 +549,21 @@ export function HostDashboard({ onPreview }: HostDashboardProps) {
                       id={`clue-${index + 1}-heading`}
                       className="text-2xl font-semibold tracking-tight"
                     >
-                      Clue {index + 1}
+                      {copy.host.sectionClue} {index + 1}
                     </h2>
                   </div>
                   <div className="grid gap-5 lg:grid-cols-[1.1fr_.8fr_1.1fr]">
                     <Textarea
                       id={`riddle-${index + 1}-prompt`}
-                      label="Riddle prompt"
+                      label={copy.host.fieldRiddlePrompt}
                       value={riddle.prompt}
                       onChange={(event) =>
                         updateRiddle(index, "prompt", event.target.value)
                       }
                       placeholder={
                         index === 0
-                          ? "Where stories are told and books come alive…"
-                          : "Write a clue only they will understand…"
+                          ? copy.host.placeholderRiddlePromptFirst
+                          : copy.host.placeholderRiddlePromptDefault
                       }
                       error={errors[`riddles.${index}.prompt`]}
                       maxLength={240}
@@ -551,27 +572,27 @@ export function HostDashboard({ onPreview }: HostDashboardProps) {
                     />
                     <Input
                       id={`riddle-${index + 1}-answer`}
-                      label="Correct answer"
+                      label={copy.host.fieldRiddleAnswer}
                       value={riddle.answer}
                       onChange={(event) =>
                         updateRiddle(index, "answer", event.target.value)
                       }
-                      placeholder="Library"
+                      placeholder={copy.host.placeholderRiddleAnswer}
                       error={errors[`riddles.${index}.answer`]}
                       maxLength={100}
                       required
                     />
                     <Textarea
                       id={`riddle-${index + 1}-success`}
-                      label="Success message (optional)"
+                      label={copy.host.fieldRiddleSuccess}
                       value={riddle.successMessage}
                       onChange={(event) =>
                         updateRiddle(index, "successMessage", event.target.value)
                       }
                       placeholder={
                         index === 2
-                          ? "You did it! The big surprise awaits."
-                          : "You're on the right track!"
+                          ? copy.host.placeholderRiddleSuccessLast
+                          : copy.host.placeholderRiddleSuccessDefault
                       }
                       maxLength={180}
                       rows={2}
@@ -591,22 +612,22 @@ export function HostDashboard({ onPreview }: HostDashboardProps) {
                     </span>
                     <div>
                       <h2 id="share-link-heading" className="font-semibold">
-                        Share link
+                        {copy.host.shareLinkTitle}
                       </h2>
                       <p className="mt-1 text-sm leading-5 text-brand-charcoal">
-                        Generate a link to share your mystery date.
+                        {copy.host.shareLinkCardSubtitle}
                       </p>
                     </div>
                   </div>
                   <div className="flex min-w-0 flex-col gap-2 sm:flex-row">
                     <label htmlFor="share-link" className="sr-only">
-                      Generated share link
+                      {copy.host.generatedShareLinkLabel}
                     </label>
                     <input
                       id="share-link"
                       className="min-h-11 min-w-0 flex-1 rounded-xl border border-brand-charcoal/30 bg-brand-floral px-3 text-sm text-brand-carbon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-watermelon focus-visible:ring-offset-2 focus-visible:ring-offset-brand-floral"
                       value={generatedLink}
-                      placeholder="Your generated link will appear here"
+                      placeholder={copy.host.generatedShareLinkPlaceholder}
                       readOnly
                     />
                     <Button
@@ -615,7 +636,7 @@ export function HostDashboard({ onPreview }: HostDashboardProps) {
                       disabled={!generatedLink}
                       icon={<Copy className="h-4 w-4" aria-hidden="true" />}
                     >
-                      Copy link
+                      {copy.host.buttonCopyLink}
                     </Button>
                   </div>
                 </div>
@@ -636,7 +657,7 @@ export function HostDashboard({ onPreview }: HostDashboardProps) {
                     className="h-4 w-4 text-brand-watermelonDark"
                     aria-hidden="true"
                   />
-                  Your guest will solve the clues in order to reveal the surprise.
+                  {copy.host.footerHint}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   <Button
@@ -644,7 +665,7 @@ export function HostDashboard({ onPreview }: HostDashboardProps) {
                     onClick={handlePreview}
                     icon={<Eye className="h-4 w-4" aria-hidden="true" />}
                   >
-                    Preview
+                    {copy.host.buttonPreview}
                   </Button>
                   <Button
                     type="submit"
@@ -656,7 +677,9 @@ export function HostDashboard({ onPreview }: HostDashboardProps) {
                       )
                     }
                   >
-                    {generatedLink ? "Regenerate link" : "Generate share link"}
+                    {generatedLink
+                      ? copy.host.buttonRegenerateLink
+                      : copy.host.buttonGenerateShareLink}
                   </Button>
                 </div>
               </div>

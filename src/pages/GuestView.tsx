@@ -6,6 +6,16 @@ import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { GuestExperience } from "../components/GuestExperience";
 import { Brand } from "../components/Brand";
+import {
+  getAppCopy,
+  type AppLanguage,
+} from "../lib/i18n";
+import { LanguageToggle } from "../components/LanguageToggle";
+
+interface GuestViewProps {
+  language: AppLanguage;
+  onLanguageChange: (language: AppLanguage) => void;
+}
 
 function getExperienceFromUrl() {
   const payload = new URLSearchParams(window.location.search).get("data");
@@ -13,7 +23,11 @@ function getExperienceFromUrl() {
   return payload ? decodeExperience(payload) : null;
 }
 
-export function GuestView() {
+export function GuestView({
+  language,
+  onLanguageChange,
+}: GuestViewProps) {
+  const copy = getAppCopy(language);
   const experience = getExperienceFromUrl();
 
   useEffect(() => {
@@ -25,8 +39,12 @@ export function GuestView() {
   if (!experience) {
     return (
       <div className="min-h-screen bg-brand-floral text-brand-carbon">
-        <header className="mx-auto flex w-full max-w-5xl px-4 py-5 sm:px-6">
-          <Brand />
+        <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-5 sm:px-6">
+          <Brand language={language} />
+          <LanguageToggle
+            language={language}
+            onChange={onLanguageChange}
+          />
         </header>
         <main className="mx-auto flex w-full max-w-5xl items-center justify-center px-4 py-16 sm:px-6">
           <Card
@@ -38,11 +56,10 @@ export function GuestView() {
               <AlertCircle className="h-6 w-6" aria-hidden="true" />
             </span>
             <h1 className="mt-6 text-3xl font-bold tracking-tight">
-              This mystery link needs a second look.
+              {copy.guest.brokenLinkTitle}
             </h1>
             <p className="mt-3 leading-7 text-brand-charcoal">
-              The date details are missing or the link was damaged along the
-              way. Ask your partner to generate a fresh one.
+              {copy.guest.brokenLinkText}
             </p>
             <Button
               className="mt-7"
@@ -51,7 +68,7 @@ export function GuestView() {
                 window.location.href = "/";
               }}
             >
-              Go to Mystery Date
+              {copy.guest.brokenLinkButton}
             </Button>
           </Card>
         </main>
@@ -59,5 +76,11 @@ export function GuestView() {
     );
   }
 
-  return <GuestExperience experience={experience} />;
+  return (
+    <GuestExperience
+      experience={experience}
+      language={language}
+      onLanguageChange={onLanguageChange}
+    />
+  );
 }

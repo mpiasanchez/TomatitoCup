@@ -30,6 +30,12 @@ export function FormField({
   error,
   children,
 }: FormFieldProps) {
+  const requiredSuffix =
+    typeof document !== "undefined" &&
+    document.documentElement.lang.startsWith("es")
+      ? " (obligatorio)"
+      : " (required)";
+
   return (
     <div className="space-y-2">
       <label
@@ -42,7 +48,7 @@ export function FormField({
             <span className="ml-1 text-brand-watermelonDark" aria-hidden="true">
               *
             </span>
-            <span className="sr-only"> (required)</span>
+            <span className="sr-only">{requiredSuffix}</span>
           </>
         ) : null}
       </label>

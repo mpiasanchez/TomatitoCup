@@ -6,14 +6,20 @@ import type {
 import { Card } from "./Card";
 import { Celebration } from "./Celebration";
 import { SeedCluster } from "./SeedCluster";
+import {
+  getAppCopy,
+  getLocale,
+  type AppLanguage,
+} from "../lib/i18n";
 
 interface LockedSurpriseCardProps {
   experience: DateExperience;
   progress: GuestProgress;
+  language: AppLanguage;
 }
 
-function formatRevealDate(value: string): string {
-  return new Intl.DateTimeFormat(undefined, {
+function formatRevealDate(value: string, language: AppLanguage): string {
+  return new Intl.DateTimeFormat(getLocale(language), {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
@@ -22,7 +28,10 @@ function formatRevealDate(value: string): string {
 export function LockedSurpriseCard({
   experience,
   progress,
+  language,
 }: LockedSurpriseCardProps) {
+  const copy = getAppCopy(language);
+
   if (progress.isFinalUnlocked) {
     return (
       <Card
@@ -41,10 +50,10 @@ export function LockedSurpriseCard({
             tabIndex={-1}
             className="text-3xl font-bold tracking-tight focus:outline-none sm:text-4xl"
           >
-            Surprise unlocked.
+            {copy.surprise.unlockedTitle}
           </h2>
           <p className="mt-2 text-base text-brand-floral/75">
-            The mystery was worth it.
+            {copy.surprise.unlockedSubtitle}
           </p>
           <div className="mt-8 rounded-[1.35rem] border border-brand-floral/25 bg-black/10 px-5 py-7 sm:px-8">
             <p className="text-xl font-semibold leading-snug sm:text-2xl">
@@ -59,7 +68,7 @@ export function LockedSurpriseCard({
               ) : null}
               <span className="inline-flex items-center gap-2">
                 <CalendarDays className="h-4 w-4" aria-hidden="true" />
-                {formatRevealDate(experience.scheduledAt)}
+                {formatRevealDate(experience.scheduledAt, language)}
               </span>
             </div>
           </div>
@@ -68,7 +77,7 @@ export function LockedSurpriseCard({
               className="h-4 w-4 text-brand-watermelon"
               aria-hidden="true"
             />
-            Can&apos;t wait to see you.
+            {copy.surprise.unlockedFooter}
           </p>
         </div>
       </Card>
@@ -90,10 +99,10 @@ export function LockedSurpriseCard({
             id="locked-surprise-heading"
             className="text-lg font-semibold text-brand-carbon sm:text-xl"
           >
-            Final surprise locked
+            {copy.surprise.lockedTitle}
           </h2>
           <p className="mt-1 text-sm leading-6 text-brand-charcoal sm:text-base">
-            Solve all 3 riddles to unlock the final reveal.
+            {copy.surprise.lockedSubtitle}
           </p>
         </div>
       </div>
