@@ -202,7 +202,7 @@ const appCopy = {
     },
     guest: {
       brokenLinkTitle: "Este enlace misterioso necesita una segunda mirada.",
-      brokenLinkText: "Faltan los detalles de la cita o el enlace se dano en el camino. Pidele a tu pareja que genere uno nuevo.",
+      brokenLinkText: "Faltan los detalles de la cita o el enlace se dañó en el camino. Pídele a tu pareja que genere uno nuevo.",
       brokenLinkButton: "Ir a Cita Misteriosa",
       skipToMystery: "Saltar al misterio",
       introKicker: "Hay una sorpresa esperandote.",
