@@ -82,8 +82,8 @@ export function HomePage({
             href={HOST_DASHBOARD_PATH}
             className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-brand-carbon bg-brand-carbon px-5 py-2.5 text-sm font-semibold leading-5 text-brand-floral shadow-card transition duration-200 hover:-translate-y-0.5 hover:bg-brand-charcoal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-watermelon focus-visible:ring-offset-2 focus-visible:ring-offset-brand-floral motion-reduce:transform-none motion-reduce:transition-none sm:w-auto"
           >
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
             {copy.home.primaryCta}
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </a>
           <p className="mt-4 text-sm text-brand-charcoal">
             {copy.home.secondaryMicrocopy}

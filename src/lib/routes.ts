@@ -9,9 +9,9 @@ export function resolveAppRoute(pathname: string): AppRoute {
     return "guest";
   }
 
-  if (pathname === HOME_PATH) {
-    return "home";
+  if (pathname === HOST_DASHBOARD_PATH) {
+    return "host";
   }
 
-  return "host";
+  return "home";
 }
