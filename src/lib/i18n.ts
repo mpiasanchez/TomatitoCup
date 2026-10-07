@@ -21,6 +21,18 @@ const appCopy = {
       createYours: "Create yours",
       backToEdit: "Back to edit",
     },
+    home: {
+      skipToMain: "Skip to home content",
+      headline: "Create a date that starts with a mystery.",
+      supportingText:
+        "Plan a surprise, hide it behind three playful clues, and share a link your partner can unlock one riddle at a time.",
+      stepsLabel: "How it works",
+      stepPlan: "Plan the surprise",
+      stepRiddles: "Add three riddles",
+      stepShare: "Share the unlock link",
+      primaryCta: "Create a mystery date",
+      secondaryMicrocopy: "No account needed. Just create, share, and reveal.",
+    },
     host: {
       skipToForm: "Skip to date form",
       createTitle: "Create a mystery date",
@@ -141,6 +153,19 @@ const appCopy = {
       backToCreator: "Volver al creador",
       createYours: "Crea la tuya",
       backToEdit: "Volver a editar",
+    },
+    home: {
+      skipToMain: "Saltar al contenido de inicio",
+      headline: "Crea una cita que empieza con misterio.",
+      supportingText:
+        "Planifica una sorpresa, escondela detras de tres pistas divertidas y comparte un enlace para desbloquearla adivinanza por adivinanza.",
+      stepsLabel: "Como funciona",
+      stepPlan: "Planifica la sorpresa",
+      stepRiddles: "Agrega tres adivinanzas",
+      stepShare: "Comparte el enlace de desbloqueo",
+      primaryCta: "Crear una cita misteriosa",
+      secondaryMicrocopy:
+        "No necesitas cuenta. Solo crea, comparte y revela.",
     },
     host: {
       skipToForm: "Saltar al formulario",
