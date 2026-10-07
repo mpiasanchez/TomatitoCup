@@ -20,6 +20,7 @@ import {
   getLocale,
   type AppLanguage,
 } from "../lib/i18n";
+import { HOME_PATH } from "../lib/routes";
 import { LanguageToggle } from "./LanguageToggle";
 
 interface GuestExperienceProps {
@@ -162,7 +163,7 @@ export function GuestExperience({
               </button>
             ) : (
               <a
-                href="/"
+                href={HOME_PATH}
                 className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-semibold text-brand-charcoal hover:text-brand-carbon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-watermelon focus-visible:ring-offset-2 focus-visible:ring-offset-brand-floral"
               >
                 {copy.common.createYours}
