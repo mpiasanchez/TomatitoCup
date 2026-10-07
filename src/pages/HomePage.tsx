@@ -65,10 +65,11 @@ export function HomePage({
           <ol className="mt-4 grid gap-3 text-sm leading-6 text-brand-charcoal sm:grid-cols-3 sm:text-base">
             {steps.map((step, index) => (
               <li
-                key={step}
+                key={index}
                 className="rounded-2xl border border-brand-carbon/10 bg-brand-floral px-4 py-4"
               >
                 <span className="text-sm font-semibold text-brand-watermelonDark">
+                  <span className="sr-only">{copy.home.stepLabel} </span>
                   {index + 1}
                 </span>
                 <p className="mt-2">{step}</p>

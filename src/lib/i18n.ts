@@ -27,6 +27,7 @@ const appCopy = {
       supportingText:
         "Plan a surprise, hide it behind three playful clues, and share a link your partner can unlock one riddle at a time.",
       stepsLabel: "How it works",
+      stepLabel: "Step",
       stepPlan: "Plan the surprise",
       stepRiddles: "Add three riddles",
       stepShare: "Share the unlock link",
@@ -160,6 +161,7 @@ const appCopy = {
       supportingText:
         "Planifica una sorpresa, escóndela detrás de tres pistas divertidas y comparte un enlace para desbloquearla adivinanza por adivinanza.",
       stepsLabel: "Cómo funciona",
+      stepLabel: "Paso",
       stepPlan: "Planifica la sorpresa",
       stepRiddles: "Agrega tres adivinanzas",
       stepShare: "Comparte el enlace de desbloqueo",
