@@ -10,8 +10,11 @@ describe("resolveAppRoute", () => {
     expect(resolveAppRoute("/play")).toBe("guest");
   });
 
-  it("returns host for create and home for unknown paths", () => {
+  it("returns host for the create path", () => {
     expect(resolveAppRoute("/create")).toBe("host");
+  });
+
+  it("returns home for unknown paths", () => {
     expect(resolveAppRoute("/anything-else")).toBe("home");
   });
 });
