@@ -158,8 +158,8 @@ const appCopy = {
       skipToMain: "Saltar al contenido de inicio",
       headline: "Crea una cita que empieza con misterio.",
       supportingText:
-        "Planifica una sorpresa, escondela detras de tres pistas divertidas y comparte un enlace para desbloquearla adivinanza por adivinanza.",
-      stepsLabel: "Como funciona",
+        "Planifica una sorpresa, escóndela detrás de tres pistas divertidas y comparte un enlace para desbloquearla adivinanza por adivinanza.",
+      stepsLabel: "Cómo funciona",
       stepPlan: "Planifica la sorpresa",
       stepRiddles: "Agrega tres adivinanzas",
       stepShare: "Comparte el enlace de desbloqueo",

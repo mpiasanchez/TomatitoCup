@@ -1,6 +1,5 @@
 import { ArrowRight, Heart } from "lucide-react";
 import { Brand } from "../components/Brand";
-import { Button } from "../components/Button";
 import { LanguageToggle } from "../components/LanguageToggle";
 import { getAppCopy, type AppLanguage } from "../lib/i18n";
 import { HOST_DASHBOARD_PATH } from "../lib/routes";
@@ -41,13 +40,16 @@ export function HomePage({
         className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-6 sm:py-16"
       >
         <section className="text-center">
-          <p className="inline-flex items-center gap-2 rounded-full border border-brand-charcoal/20 bg-brand-ash/25 px-4 py-2 text-sm font-semibold text-brand-charcoal">
+          <span
+            className="inline-flex items-center gap-2 rounded-full border border-brand-charcoal/20 bg-brand-ash/25 px-4 py-2 text-sm font-semibold text-brand-charcoal"
+            aria-hidden="true"
+          >
             <Heart
               className="h-4 w-4 fill-brand-watermelon text-brand-watermelon"
               aria-hidden="true"
             />
             {copy.brand.name}
-          </p>
+          </span>
           <h1 className="mt-5 text-4xl font-bold tracking-tight sm:text-5xl">
             {copy.home.headline}
           </h1>
@@ -76,15 +78,13 @@ export function HomePage({
         </section>
 
         <section className="mt-9 text-center">
-          <Button
-            className="w-full sm:w-auto"
-            icon={<ArrowRight className="h-4 w-4" aria-hidden="true" />}
-            onClick={() => {
-              window.location.href = HOST_DASHBOARD_PATH;
-            }}
+          <a
+            href={HOST_DASHBOARD_PATH}
+            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-brand-carbon bg-brand-carbon px-5 py-2.5 text-sm font-semibold leading-5 text-brand-floral shadow-card transition duration-200 hover:-translate-y-0.5 hover:bg-brand-charcoal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-watermelon focus-visible:ring-offset-2 focus-visible:ring-offset-brand-floral motion-reduce:transform-none motion-reduce:transition-none sm:w-auto"
           >
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
             {copy.home.primaryCta}
-          </Button>
+          </a>
           <p className="mt-4 text-sm text-brand-charcoal">
             {copy.home.secondaryMicrocopy}
           </p>
