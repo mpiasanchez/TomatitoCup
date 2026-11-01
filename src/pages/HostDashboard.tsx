@@ -220,10 +220,29 @@ export function HostDashboard({
     }
     setErrors((current) => {
       const next = { ...current };
-      delete next[`riddles.${index}.prompt`];
-      delete next[`riddles.${index}.answer`];
-      delete next[`riddles.${index}.successMessage`];
-      return next;
+      const reindexed: HostFormErrors = {};
+
+      for (const [key, value] of Object.entries(next)) {
+        const match = key.match(/^riddles\.(\d+)\.(.+)$/);
+        if (!match) {
+          reindexed[key] = value;
+          continue;
+        }
+
+        const [, clueIndex, field] = match;
+        const clueNumber = Number(clueIndex);
+
+        if (clueNumber < index) {
+          reindexed[`riddles.${clueNumber}.${field}`] = value;
+          continue;
+        }
+
+        if (clueNumber > index) {
+          reindexed[`riddles.${clueNumber - 1}.${field}`] = value;
+        }
+      }
+
+      return reindexed;
     });
   }
 

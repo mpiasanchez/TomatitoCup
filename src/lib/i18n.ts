@@ -139,7 +139,7 @@ const appCopy = {
       scheduledRequired: "Choose a date and time.",
       scheduledInvalid: "Choose a valid date and time.",
       finalSurpriseRequired: "Describe the final surprise.",
-      riddlesRequired: "A mystery date needs exactly three clues.",
+      riddlesRequired: "A mystery date needs at least three clues.",
       riddlePromptRequired: (index: number) => `Add a prompt for clue ${index}.`,
       riddleAnswerRequired: (index: number) => `Add the correct answer for clue ${index}.`,
     },
@@ -276,7 +276,7 @@ const appCopy = {
       scheduledRequired: "Elige una fecha y hora.",
       scheduledInvalid: "Elige una fecha y hora validas.",
       finalSurpriseRequired: "Describe la sorpresa final.",
-      riddlesRequired: "Una cita misteriosa necesita exactamente tres pistas.",
+      riddlesRequired: "Una cita misteriosa necesita al menos tres pistas.",
       riddlePromptRequired: (index: number) => `Agrega el enunciado de la pista ${index}.`,
       riddleAnswerRequired: (index: number) =>
         `Agrega la respuesta correcta de la pista ${index}.`,
