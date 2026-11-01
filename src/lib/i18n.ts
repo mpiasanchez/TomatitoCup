@@ -131,7 +131,7 @@ const appCopy = {
       unlockedSubtitle: "The mystery was worth it.",
       unlockedFooter: "I can't wait to see you.",
       lockedTitle: "Final surprise locked",
-      lockedSubtitle: "Solve all 3 riddles to unlock the final reveal.",
+      lockedSubtitle: "Solve all {{count}} riddles to unlock the final reveal.",
     },
     validation: {
       titleRequired: "Add a title for your mystery date.",
@@ -268,7 +268,7 @@ const appCopy = {
       unlockedSubtitle: "El misterio valio la pena.",
       unlockedFooter: "No puedo esperar para verte.",
       lockedTitle: "Sorpresa final bloqueada",
-      lockedSubtitle: "Resuelve las 3 adivinanzas para desbloquear la revelacion final.",
+      lockedSubtitle: "Resuelve las {{count}} adivinanzas para desbloquear la revelacion final.",
     },
     validation: {
       titleRequired: "Agrega un titulo para tu cita misteriosa.",
