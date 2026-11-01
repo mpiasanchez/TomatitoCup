@@ -1,11 +1,13 @@
 import type {
   DateExperience,
   GuestProgress,
+  HostFormDraft,
 } from "../types/dateExperience";
 import { isValidDateExperience } from "./validation";
 
 export const STORAGE_KEYS = {
   HOST_DATES: "surprise-date.host.dates",
+  HOST_DRAFT: "surprise-date.host.draft",
   GUEST_PROGRESS_PREFIX: "surprise-date.guest.progress.",
 } as const;
 
@@ -50,6 +52,78 @@ export function saveHostDate(experience: DateExperience): void {
     storage.setItem(STORAGE_KEYS.HOST_DATES, JSON.stringify(nextDates));
   } catch {
     // LocalStorage may be unavailable in private or restricted browsing modes.
+  }
+}
+
+export function getHostDraft(): HostFormDraft | null {
+  try {
+    const value = getStorage()?.getItem(STORAGE_KEYS.HOST_DRAFT);
+    const parsed: unknown = value ? JSON.parse(value) : null;
+
+    if (!parsed || typeof parsed !== "object") {
+      return null;
+    }
+
+    const draft = parsed as Partial<HostFormDraft>;
+    const riddles = Array.isArray(draft.riddles) ? draft.riddles : [];
+
+    if (
+      typeof draft.title !== "string" ||
+      typeof draft.teaser !== "string" ||
+      typeof draft.scheduledAt !== "string" ||
+      typeof draft.startingLocation !== "string" ||
+      typeof draft.finalSurpriseText !== "string" ||
+      typeof draft.finalSurpriseLocation !== "string" ||
+      riddles.length !== 3 ||
+      !riddles.every(
+        (riddle) =>
+          riddle &&
+          typeof riddle === "object" &&
+          typeof (riddle as Record<string, unknown>).prompt === "string" &&
+          typeof (riddle as Record<string, unknown>).answer === "string" &&
+          typeof (riddle as Record<string, unknown>).successMessage === "string",
+      )
+    ) {
+      return null;
+    }
+
+    const normalizedRiddles = riddles.map((riddle) => ({
+      prompt: (riddle as Record<string, string>).prompt,
+      answer: (riddle as Record<string, string>).answer,
+      successMessage: (riddle as Record<string, string>).successMessage,
+    }));
+
+    return {
+      title: draft.title,
+      teaser: draft.teaser,
+      scheduledAt: draft.scheduledAt,
+      startingLocation: draft.startingLocation,
+      finalSurpriseText: draft.finalSurpriseText,
+      finalSurpriseLocation: draft.finalSurpriseLocation,
+      riddles: normalizedRiddles as [
+        typeof normalizedRiddles[0],
+        typeof normalizedRiddles[1],
+        typeof normalizedRiddles[2],
+      ],
+    };
+  } catch {
+    return null;
+  }
+}
+
+export function saveHostDraft(draft: HostFormDraft): void {
+  try {
+    getStorage()?.setItem(STORAGE_KEYS.HOST_DRAFT, JSON.stringify(draft));
+  } catch {
+    // Draft persistence may be unavailable in restricted browsing contexts.
+  }
+}
+
+export function clearHostDraft(): void {
+  try {
+    getStorage()?.removeItem(STORAGE_KEYS.HOST_DRAFT);
+  } catch {
+    // Draft persistence may be unavailable in restricted browsing contexts.
   }
 }
 
