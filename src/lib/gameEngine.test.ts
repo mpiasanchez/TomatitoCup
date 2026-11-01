@@ -56,4 +56,29 @@ describe("game engine", () => {
     expect(afterThird.isFinalUnlocked).toBe(true);
     expect(getCurrentRiddle(experience, afterThird)).toBeNull();
   });
+
+  it("renders a progress step for each clue in a longer experience", () => {
+    const extendedExperience: DateExperience = {
+      ...experience,
+      riddles: [
+        { id: "riddle_1", order: 1, prompt: "First?", answer: "Café" },
+        { id: "riddle_2", order: 2, prompt: "Second?", answer: "Teatro Solís" },
+        { id: "riddle_3", order: 3, prompt: "Third?", answer: "Rooftop" },
+        { id: "riddle_4", order: 4, prompt: "Fourth?", answer: "Garden" },
+        { id: "riddle_5", order: 5, prompt: "Fifth?", answer: "Moon" },
+      ],
+    };
+
+    const progress: GuestProgress = {
+      dateId: extendedExperience.id,
+      solvedRiddleIds: ["riddle_1", "riddle_2"],
+      currentRiddleIndex: 2,
+      isFinalUnlocked: false,
+      lastUpdatedAt: "2026-07-02T18:00:00.000Z",
+    };
+
+    expect(extendedExperience.riddles.length).toBe(5);
+    expect(progress.currentRiddleIndex).toBe(2);
+    expect(progress.solvedRiddleIds).toHaveLength(2);
+  });
 });

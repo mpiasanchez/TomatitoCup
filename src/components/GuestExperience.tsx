@@ -203,7 +203,11 @@ export function GuestExperience({
         </section>
 
         <div className="mt-9">
-          <ProgressSteps progress={progress} language={language} />
+          <ProgressSteps
+            progress={progress}
+            language={language}
+            totalRiddles={experience.riddles.length}
+          />
         </div>
 
         <div
