@@ -43,4 +43,25 @@ describe("host validation", () => {
       }),
     ).toBe(false);
   });
+
+  it("accepts decoded experiences with more than three riddles", () => {
+    expect(
+      isValidDateExperience({
+        id: "date_2",
+        version: 1,
+        title: "Test",
+        teaser: "Teaser",
+        scheduledAt: "2026-08-12T22:30:00.000Z",
+        finalSurpriseText: "Surprise",
+        riddles: [
+          { id: "r1", order: 1, prompt: "A", answer: "A" },
+          { id: "r2", order: 2, prompt: "B", answer: "B" },
+          { id: "r3", order: 3, prompt: "C", answer: "C" },
+          { id: "r4", order: 4, prompt: "D", answer: "D" },
+        ],
+        createdAt: "2026-07-02T18:00:00.000Z",
+        updatedAt: "2026-07-02T18:00:00.000Z",
+      }),
+    ).toBe(true);
+  });
 });

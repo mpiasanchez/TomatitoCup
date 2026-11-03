@@ -7,13 +7,16 @@ import {
   Heart,
   Link2,
   MapPin,
+  Plus,
   RotateCcw,
   Sparkles,
+  X,
 } from "lucide-react";
 import { useRef, useState, type FormEvent } from "react";
 import type {
   DateExperience,
   HostFormDraft,
+  HostRiddleDraft,
 } from "../types/dateExperience";
 import { encodeExperience } from "../lib/encoding";
 import { createId } from "../lib/ids";
@@ -132,15 +135,17 @@ export function HostDashboard({
   onLanguageChange,
 }: HostDashboardProps) {
   const copy = getAppCopy(language);
+  const [draft, setDraft] = useState<HostFormDraft>(EMPTY_DRAFT);
+  
   const sectionLinks = [
     { href: "#date-details", label: copy.host.sectionDateDetails, number: 1 },
     { href: "#final-reveal", label: copy.host.sectionFinalReveal, number: 2 },
-    { href: "#clue-1", label: `${copy.host.sectionClue} 1`, number: 3 },
-    { href: "#clue-2", label: `${copy.host.sectionClue} 2`, number: 4 },
-    { href: "#clue-3", label: `${copy.host.sectionClue} 3`, number: 5 },
+    ...draft.riddles.map((_, index) => ({
+      href: `#clue-${index + 1}`,
+      label: `${copy.host.sectionClue} ${index + 1}`,
+      number: index + 3,
+    })),
   ];
-
-  const [draft, setDraft] = useState<HostFormDraft>(EMPTY_DRAFT);
   const [errors, setErrors] = useState<HostFormErrors>({});
   const [generatedLink, setGeneratedLink] = useState("");
   const [lastExperience, setLastExperience] = useState<
@@ -189,6 +194,55 @@ export function HostDashboard({
       const next = { ...current };
       delete next[`riddles.${index}.${field}`];
       return next;
+    });
+  }
+
+  function addClue() {
+    setDraft((current) => {
+      const newRiddle: HostRiddleDraft = { prompt: "", answer: "", successMessage: "" };
+      return { ...current, riddles: [...current.riddles, newRiddle] };
+    });
+    if (generatedLink) {
+      setGeneratedLink("");
+      setStatusMessage(copy.host.statusDetailsChanged);
+    }
+  }
+
+  function removeClue(index: number) {
+    if (draft.riddles.length <= 3) return;
+    setDraft((current) => ({
+      ...current,
+      riddles: current.riddles.filter((_, i) => i !== index),
+    }));
+    if (generatedLink) {
+      setGeneratedLink("");
+      setStatusMessage(copy.host.statusDetailsChanged);
+    }
+    setErrors((current) => {
+      const next = { ...current };
+      const reindexed: HostFormErrors = {};
+
+      for (const [key, value] of Object.entries(next)) {
+        const match = key.match(/^riddles\.(\d+)\.(.+)$/);
+        if (!match) {
+          reindexed[key] = value;
+          continue;
+        }
+
+        const [, clueIndex, field] = match;
+        const clueNumber = Number(clueIndex);
+
+        if (clueNumber < index) {
+          reindexed[`riddles.${clueNumber}.${field}`] = value;
+          continue;
+        }
+
+        if (clueNumber > index) {
+          reindexed[`riddles.${clueNumber - 1}.${field}`] = value;
+        }
+      }
+
+      return reindexed;
     });
   }
 
@@ -541,16 +595,29 @@ export function HostDashboard({
                   className="scroll-mt-4 border-b border-brand-carbon/15 py-6"
                   aria-labelledby={`clue-${index + 1}-heading`}
                 >
-                  <div className="mb-4 flex items-center gap-3">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-ash/70 text-sm font-bold text-brand-carbon">
-                      {index + 3}
-                    </span>
-                    <h2
-                      id={`clue-${index + 1}-heading`}
-                      className="text-2xl font-semibold tracking-tight"
-                    >
-                      {copy.host.sectionClue} {index + 1}
-                    </h2>
+                  <div className="mb-4 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-ash/70 text-sm font-bold text-brand-carbon">
+                        {index + 3}
+                      </span>
+                      <h2
+                        id={`clue-${index + 1}-heading`}
+                        className="text-2xl font-semibold tracking-tight"
+                      >
+                        {copy.host.sectionClue} {index + 1}
+                      </h2>
+                    </div>
+                    {index >= 3 && (
+                      <Button
+                        type="button"
+                        variant="danger"
+                        icon={<X className="h-4 w-4" aria-hidden="true" />}
+                        onClick={() => removeClue(index)}
+                        aria-label={`${copy.host.buttonRemoveClue} ${index + 1}`}
+                      >
+                        {copy.host.buttonRemoveClue}
+                      </Button>
+                    )}
                   </div>
                   <div className="grid gap-5 lg:grid-cols-[1.1fr_.8fr_1.1fr]">
                     <Textarea
@@ -600,6 +667,18 @@ export function HostDashboard({
                   </div>
                 </section>
               ))}
+
+              <div className="flex justify-center border-b border-brand-carbon/15 py-6">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  icon={<Plus className="h-4 w-4" aria-hidden="true" />}
+                  onClick={addClue}
+                  aria-label={copy.host.buttonAddClue}
+                >
+                  {copy.host.buttonAddClue}
+                </Button>
+              </div>
 
               <section
                 className="relative mt-7 overflow-hidden rounded-cozy border border-brand-charcoal/25 bg-brand-ash/30 p-5 sm:p-6"

@@ -6,33 +6,37 @@ import { getAppCopy, type AppLanguage } from "../lib/i18n";
 interface ProgressStepsProps {
   progress: GuestProgress;
   language: AppLanguage;
+  totalRiddles: number;
 }
 
 export function ProgressSteps({
   progress,
   language,
+  totalRiddles,
 }: ProgressStepsProps) {
   const copy = getAppCopy(language);
 
+  const clueSteps = Array.from({ length: totalRiddles }, (_, index) => ({
+    label: `${copy.progress.clueLabel} ${index + 1}`,
+    index,
+  }));
   const steps = [
-    { label: `${copy.progress.clueLabel} 1`, index: 0 },
-    { label: `${copy.progress.clueLabel} 2`, index: 1 },
-    { label: `${copy.progress.clueLabel} 3`, index: 2 },
-    { label: copy.progress.surpriseLabel, index: 3 },
+    ...clueSteps,
+    { label: copy.progress.surpriseLabel, index: totalRiddles },
   ];
 
   return (
     <nav aria-label={copy.progress.navLabel}>
       <ol className="grid grid-cols-2 overflow-hidden rounded-cozy border border-brand-carbon/10 bg-brand-floral shadow-card sm:grid-cols-4">
         {steps.map((step, stepIndex) => {
-          const isFinalStep = stepIndex === 3;
+          const isFinalStep = stepIndex === steps.length - 1;
           const isComplete = isFinalStep
             ? progress.isFinalUnlocked
-            : progress.solvedRiddleIds.length > stepIndex;
+            : progress.solvedRiddleIds.length > step.index;
           const isCurrent =
             !progress.isFinalUnlocked &&
-            ((isFinalStep && progress.solvedRiddleIds.length === 3) ||
-              progress.currentRiddleIndex === stepIndex);
+            ((isFinalStep && progress.solvedRiddleIds.length === totalRiddles) ||
+              progress.currentRiddleIndex === step.index);
           const status = isComplete
             ? copy.progress.statusComplete
             : isCurrent

@@ -41,5 +41,5 @@ export type HostFormDraft = {
   startingLocation: string;
   finalSurpriseText: string;
   finalSurpriseLocation: string;
-  riddles: [HostRiddleDraft, HostRiddleDraft, HostRiddleDraft];
+  riddles: HostRiddleDraft[];
 };
