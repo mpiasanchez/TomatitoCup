@@ -53,6 +53,20 @@ describe("host draft persistence", () => {
     expect(getHostDraft()).toEqual(draft);
   });
 
+  it("preserves drafts with more than three clues", () => {
+    const withFourClues: HostFormDraft = {
+      ...draft,
+      riddles: [
+        ...draft.riddles,
+        { prompt: "Fourth clue", answer: "rain", successMessage: "Almost there." },
+      ],
+    };
+
+    saveHostDraft(withFourClues);
+
+    expect(getHostDraft()).toEqual(withFourClues);
+  });
+
   it("clears persisted draft data", () => {
     saveHostDraft(draft);
     clearHostDraft();
