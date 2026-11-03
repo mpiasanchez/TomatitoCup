@@ -74,7 +74,7 @@ export function getHostDraft(): HostFormDraft | null {
       typeof draft.startingLocation !== "string" ||
       typeof draft.finalSurpriseText !== "string" ||
       typeof draft.finalSurpriseLocation !== "string" ||
-      riddles.length !== 3 ||
+      riddles.length < 3 ||
       !riddles.every(
         (riddle) =>
           riddle &&
@@ -100,11 +100,7 @@ export function getHostDraft(): HostFormDraft | null {
       startingLocation: draft.startingLocation,
       finalSurpriseText: draft.finalSurpriseText,
       finalSurpriseLocation: draft.finalSurpriseLocation,
-      riddles: normalizedRiddles as [
-        typeof normalizedRiddles[0],
-        typeof normalizedRiddles[1],
-        typeof normalizedRiddles[2],
-      ],
+      riddles: normalizedRiddles as HostFormDraft["riddles"],
     };
   } catch {
     return null;
