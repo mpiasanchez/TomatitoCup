@@ -23,7 +23,6 @@ function isRiddle(value: unknown): value is Riddle {
     typeof record.order === "number" &&
     Number.isInteger(record.order) &&
     record.order >= 1 &&
-    record.order <= 3 &&
     isNonEmptyString(record.prompt) &&
     isNonEmptyString(record.answer) &&
     (record.successMessage === undefined ||
@@ -57,20 +56,16 @@ export function isValidDateExperience(
     (record.finalSurpriseLocation !== undefined &&
       typeof record.finalSurpriseLocation !== "string") ||
     !Array.isArray(record.riddles) ||
-    record.riddles.length !== 3 ||
+    record.riddles.length < 3 ||
     !record.riddles.every(isRiddle)
   ) {
     return false;
   }
 
-  const orders = record.riddles.map((riddle) => riddle.order);
   const ids = record.riddles.map((riddle) => riddle.id);
+  const orders = record.riddles.map((riddle) => riddle.order);
 
-  return (
-    new Set(orders).size === 3 &&
-    orders.every((order) => order >= 1 && order <= 3) &&
-    new Set(ids).size === 3
-  );
+  return new Set(ids).size === record.riddles.length && new Set(orders).size === record.riddles.length;
 }
 
 const defaultValidationCopy: ValidationCopy = getAppCopy("en").validation;
@@ -95,7 +90,7 @@ export function validateHostDraft(
   if (!draft.finalSurpriseText.trim()) {
     errors.finalSurpriseText = copy.finalSurpriseRequired;
   }
-  if (draft.riddles.length !== 3) {
+  if (draft.riddles.length < 3) {
     errors.riddles = copy.riddlesRequired;
   }
 

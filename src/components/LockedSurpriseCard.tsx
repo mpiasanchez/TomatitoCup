@@ -102,7 +102,7 @@ export function LockedSurpriseCard({
             {copy.surprise.lockedTitle}
           </h2>
           <p className="mt-1 text-sm leading-6 text-brand-charcoal sm:text-base">
-            {copy.surprise.lockedSubtitle}
+            {copy.surprise.lockedSubtitle.replace("{{count}}", String(experience.riddles.length))}
           </p>
         </div>
       </div>
