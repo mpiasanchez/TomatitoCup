@@ -12,7 +12,7 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import type {
   DateExperience,
   HostFormDraft,
@@ -20,7 +20,12 @@ import type {
 } from "../types/dateExperience";
 import { encodeExperience } from "../lib/encoding";
 import { createId } from "../lib/ids";
-import { saveHostDate } from "../lib/storage";
+import {
+  clearHostDraft,
+  getHostDraft,
+  saveHostDate,
+  saveHostDraft,
+} from "../lib/storage";
 import {
   validateHostDraft,
   type HostFormErrors,
@@ -135,8 +140,7 @@ export function HostDashboard({
   onLanguageChange,
 }: HostDashboardProps) {
   const copy = getAppCopy(language);
-  const [draft, setDraft] = useState<HostFormDraft>(EMPTY_DRAFT);
-  
+  const [draft, setDraft] = useState<HostFormDraft>(() => getHostDraft() ?? EMPTY_DRAFT);
   const sectionLinks = [
     { href: "#date-details", label: copy.host.sectionDateDetails, number: 1 },
     { href: "#final-reveal", label: copy.host.sectionFinalReveal, number: 2 },
@@ -153,6 +157,28 @@ export function HostDashboard({
   >();
   const [statusMessage, setStatusMessage] = useState("");
   const errorSummaryRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (
+      draft.title.trim() === "" &&
+      draft.teaser.trim() === "" &&
+      draft.scheduledAt.trim() === "" &&
+      draft.startingLocation.trim() === "" &&
+      draft.finalSurpriseText.trim() === "" &&
+      draft.finalSurpriseLocation.trim() === "" &&
+      draft.riddles.every(
+        (riddle) =>
+          riddle.prompt.trim() === "" &&
+          riddle.answer.trim() === "" &&
+          riddle.successMessage.trim() === "",
+      )
+    ) {
+      clearHostDraft();
+      return;
+    }
+
+    saveHostDraft(draft);
+  }, [draft]);
 
   function updateField<Key extends keyof Omit<HostFormDraft, "riddles">>(
     key: Key,
@@ -299,6 +325,7 @@ export function HostDashboard({
 
   function handleReset() {
     setDraft(EMPTY_DRAFT);
+    clearHostDraft();
     setErrors({});
     setGeneratedLink("");
     setLastExperience(undefined);
