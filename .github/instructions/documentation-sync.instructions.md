@@ -1,36 +1,53 @@
 ---
 name: "Documentation Sync"
-description: "Use after any code change that adds, removes, or modifies application behavior to keep docs/functional/ aligned with the actual implementation. Applies to all src/ changes."
-applyTo: "src/**"
+description: "Always triggered when code changes are requested. Review and update docs/ (including functional, technical, and other documentation types) to align with the implementation."
+applyTo: "src/**, lib/**, types/**"
 ---
 
 # Documentation Sync
 
-Auto-apply scope: This instruction auto-attaches whenever source code under `src/` is modified. It does not apply to documentation-only changes, configuration files, or test files unless those directly reveal a behavioral change.
+**How it works:** This instruction activates whenever you are asked to implement code changes. After making or reviewing those changes, you must always review the relevant documentation and either confirm it is accurate or propose updates.
 
-Keep `docs/functional/` as the source of truth for expected application behaviors. After any code change, verify that the documentation still accurately describes what the code does, and update it if it does not.
+**Documentation scope:** The repository maintains multiple documentation types under `docs/`:
+- `docs/functional/` — user-facing behaviors, flows, and features (the source of truth for expected app behavior)
+- `docs/technical/` — architecture, internal design, and development guidance (future; scope as needed)
+- Other documentation types as they are added
 
-## Activation Conditions
+Keep all documentation synchronized with the actual implementation.
 
-Trigger a documentation review when a change to `src/` does any of the following:
+## When to Review & Update Documentation
 
-- Adds a new user-facing feature, flow, or screen.
-- Removes or changes the behavior of an existing feature.
-- Changes a field (its name, type, required status, character limit, or optionality).
-- Changes how the application validates, stores, or processes data.
-- Changes the rules governing answer matching, riddle ordering, progress persistence, link encoding, or language selection.
-- Changes what is shown to the host or guest under any condition (including error states, empty states, and success states).
-- Changes a hard constraint (e.g. minimum riddle count, required fields, link invalidation rules).
+**Always** perform a documentation review after implementing code changes. Review happens in two cases:
 
-Do not update documentation for:
-- Internal refactors with no user-visible effect.
-- Style, layout, or animation changes.
-- Test additions or changes.
-- Dependency updates that do not change behavior.
+1. **Code adds, removes, or changes user-facing behavior** — update `docs/functional/` and any other affected docs
+2. **Code is an internal refactor with no behavioral change** — verify that no docs accidentally describe the old behavior, and confirm existing docs remain accurate
+
+**Behavioral changes** include:
+
+- Adding a new user-facing feature, flow, or screen.
+- Removing or changing the behavior of an existing feature.
+- Changing a field (its name, type, required status, character limit, or optionality).
+- Changing how the application validates, stores, or processes data.
+- Changing the rules governing answer matching, riddle ordering, progress persistence, link encoding, or language selection.
+- Changing what is shown to the host or guest under any condition (including error states, empty states, and success states).
+- Changing a hard constraint (e.g. minimum riddle count, required fields, link invalidation rules).
+
+**Cases where documentation review is still required but likely needs no updates:**
+
+- Internal refactors with no user-visible effect (verify docs describe the current behavior correctly).
+- Style, layout, or animation changes (review only to confirm docs don't contradict the new visuals).
+- Test additions or changes (no doc updates needed unless test reveals an undocumented behavior).
+- Dependency updates that don't change behavior (verify docs remain consistent).
 
 ## Documentation Map
 
-The documentation lives in `docs/functional/`. Each file covers a specific feature area. Use the table below to decide which files to review for a given source change.
+This map helps you find which documentation to review. Reference the file that was changed and look up which documentation section(s) it affects.
+
+**Note:** Currently only `docs/functional/` exists. As technical and other documentation types are added, this map will expand.
+
+### Functional Documentation
+
+The functional docs live in `docs/functional/` and describe user-facing behaviors, flows, and features.
 
 | Changed source area | Files to review |
 |---------------------|-----------------|
@@ -50,7 +67,12 @@ The documentation lives in `docs/functional/`. Each file covers a specific featu
 | `src/types/dateExperience.ts` | Any file whose described behavior depends on the changed type |
 | `src/App.tsx` | `overview.md` |
 
-When in doubt, also check `README.md` in `docs/functional/` — update it only if a new document is added or an existing one is renamed or removed.
+When in doubt, also check `docs/functional/README.md` — update it only if a new document is added or an existing one is renamed or removed.
+
+### Technical Documentation
+
+Technical docs (when added to `docs/technical/`) will describe architecture, internal design patterns, and development guidance. Update these when you make changes that affect how the system is structured or implemented.
+
 
 ## Review Workflow
 
@@ -71,13 +93,47 @@ When in doubt, also check `README.md` in `docs/functional/` — update it only i
 - Do not add speculative content about future features.
 - Keep the `docs/functional/README.md` index current: add a row if a new doc file is created.
 
-## Output
+## Mandatory Output
 
-After reviewing, report:
+Your response to any code change request **must always include** a documentation review section. This section must:
 
-- Which source changes were reviewed.
-- Which documentation files were affected and why.
-- What was updated (with a brief description of each change).
-- Whether any behavioral change could not be fully described (and why).
+1. **Declare whether behavioral change occurred** — state clearly if the code change adds/modifies/removes user-facing behavior, or if it is a refactor/style/test-only change.
 
-If no documentation update is needed, state that explicitly with the reason (e.g., "this change is a style refactor with no user-facing behavioral effect").
+2. **Report findings** — for each documentation type that applies (`docs/functional/`, `docs/technical/`, etc.):
+   - Which files were checked and why.
+   - Whether updates are needed, and if so, what changed.
+   - If no updates are needed, briefly explain why the docs remain accurate.
+
+3. **Propose or perform updates** — if behavioral changes require doc updates:
+   - If you are generating changes (a code task), propose the documentation updates in a separate section.
+   - If you are reviewing a change, report what should be updated and provide the updates.
+
+Example output format:
+
+```
+## Documentation Review
+
+**Behavioral change:** Yes — added a new riddle success message field.
+
+**Functional documentation:**
+- Checked: `host-creating-experience.md` (Form Sections)
+- Status: Needs update
+- Change: Add "Success message" to the Riddles section table, mark as optional
+
+**Technical documentation:**
+- Not applicable (no architectural changes)
+
+**Proposed updates:**
+[markdown content showing exact changes to make]
+```
+
+If the change is refactor-only:
+
+```
+## Documentation Review
+
+**Behavioral change:** No — internal refactoring of state management.
+
+**Findings:** All existing documentation remains accurate. No updates needed.
+```
+
