@@ -23,4 +23,4 @@ The page displays:
 ## Expected Behavior
 
 - Clicking **Create a mystery date** navigates the user to the Host Dashboard (`/create`).
-- The page has no interactive state. It is purely informational.
+- The page is informational but still includes interactive language switching in the header and a keyboard skip link for accessibility.

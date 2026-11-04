@@ -29,6 +29,7 @@ These constraints are enforced by the application and cannot be bypassed:
 |------|--------|
 | Minimum 3 riddles | An experience cannot be created or opened with fewer than 3 riddles. |
 | Required fields | Title, teaser, scheduled date/time, final surprise text, and all riddle prompts and answers are required. |
+| Character limits | Title: 80, teaser: 180, starting location: 140, final surprise text: 300, final location: 140, riddle prompt: 240, correct answer: 100, success message: 180. |
 | Riddle order | The guest must solve riddles in sequence. Skipping is not allowed. |
 | Link invalidation on edit | Any change to the form after generating a link discards that link. A new one must be generated. |
 | Answer normalization | Answer comparison ignores case, punctuation, and extra whitespace. Only letters, numbers, and spaces are compared. |

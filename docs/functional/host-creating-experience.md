@@ -19,20 +19,20 @@ The host creates a mystery date by filling in a form with date details, a final 
 
 ### Section 2 — The Final Reveal
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| Final surprise text | Yes | The actual reveal shown after all riddles are solved (e.g., "Rooftop dinner for two"). |
-| Final location | No | Where the surprise takes place. Shown on the reveal card if provided. |
+| Field | Required | Constraints | Description |
+|-------|----------|-------------|-------------|
+| Final surprise text | Yes | Max 300 characters | The actual reveal shown after all riddles are solved (e.g., "Rooftop dinner for two"). |
+| Final location | No | Max 140 characters | Where the surprise takes place. Shown on the reveal card if provided. |
 
 ### Section 3 — Riddles
 
 Each riddle has three fields:
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| Riddle prompt | Yes | The clue or question shown to the guest. |
-| Correct answer | Yes | The answer the guest must submit to solve the clue. |
-| Success message | No | Shown to the guest after solving this clue. Falls back to a generic confirmation message if left blank. |
+| Field | Required | Constraints | Description |
+|-------|----------|-------------|-------------|
+| Riddle prompt | Yes | Max 240 characters | The clue or question shown to the guest. |
+| Correct answer | Yes | Max 100 characters | The answer the guest must submit to solve the clue. |
+| Success message | No | Max 180 characters | Shown to the guest after solving this clue. Falls back to a generic confirmation message if left blank. |
 
 ---
 
