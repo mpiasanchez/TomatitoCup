@@ -77,7 +77,7 @@ Clicking the **Reset** button clears all form fields, removes the draft from loc
 The host can click **Preview experience** at any time to see a read-only simulation of the guest's view. The preview:
 
 - Uses the same interface the guest will see, with the current form data.
-- Does **not** validate required fields before opening.
+- Validates required fields before opening, using the same rules as link generation.
 - Does **not** save any guest progress to local storage.
 - Provides a **Back to edit** button to return to the form.
 
