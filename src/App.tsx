@@ -161,8 +161,14 @@ export function App() {
         userId={user?.id ?? ""}
         onLanguageChange={setLanguage}
         onSignOut={async () => {
-          manualSignOutRef.current = true;
-          await signOut();
+         manualSignOutRef.current = true;
+         const error = await signOut();
+
+         if (error) {
+           manualSignOutRef.current = false;
+           setAuthMessage(error.message || copy.auth.genericError);
+           return;
+         }
         }}
       />
     );
@@ -196,7 +202,13 @@ export function App() {
       onLanguageChange={setLanguage}
       onSignOut={async () => {
         manualSignOutRef.current = true;
-        await signOut();
+        const error = await signOut();
+
+        if (error) {
+          manualSignOutRef.current = false;
+          setAuthMessage(error.message || copy.auth.genericError);
+          return;
+        }
 
         if (window.location.pathname !== GUEST_PATH) {
           window.location.href = "/";

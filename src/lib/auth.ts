@@ -31,12 +31,8 @@ export function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeAuthEmail(email));
 }
 
-export function validatePassword(password: string): string | null {
-  if (password.length < MIN_PASSWORD_LENGTH) {
-    return `Password must be at least ${MIN_PASSWORD_LENGTH} characters.`;
-  }
-
-  return null;
+export function validatePassword(password: string): boolean {
+  return password.length >= MIN_PASSWORD_LENGTH;
 }
 
 export function getResetPasswordRedirectUrl(origin: string = window.location.origin): string {

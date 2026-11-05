@@ -17,8 +17,8 @@ describe("auth helpers", () => {
   });
 
   it("validates password length", () => {
-    expect(validatePassword("1234567")).toBe("Password must be at least 8 characters.");
-    expect(validatePassword("12345678")).toBeNull();
+    expect(validatePassword("1234567")).toBe(false);
+    expect(validatePassword("12345678")).toBe(true);
   });
 
   it("builds reset password redirect urls", () => {

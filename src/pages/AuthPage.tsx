@@ -107,9 +107,7 @@ export function AuthPage({
       return false;
     }
 
-    const passwordError = validatePassword(value);
-
-    if (passwordError) {
+    if (!validatePassword(value)) {
       setError(copy.auth.passwordTooShort);
       return false;
     }
