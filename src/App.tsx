@@ -106,20 +106,20 @@ export function App() {
     };
   }, [copy.auth.authRequiredText, copy.auth.genericError, copy.auth.sessionExpiredText]);
 
-  if (!isSupabaseConfigured()) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-brand-floral px-4 text-center text-brand-charcoal">
-        <p role="alert">{copy.auth.configError}</p>
-      </div>
-    );
-  }
-
-  if (isSessionLoading) {
+  if (isSessionLoading && isSupabaseConfigured()) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-brand-floral px-4 text-center text-brand-charcoal">
         <p role="status" aria-live="polite">
           {copy.auth.signingIn}
         </p>
+      </div>
+    );
+  }
+
+  if (!isSupabaseConfigured() && (route === "guest" || route === "host" || route === "resetPassword")) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-brand-floral px-4 text-center text-brand-charcoal">
+        <p role="alert">{copy.auth.configError}</p>
       </div>
     );
   }
