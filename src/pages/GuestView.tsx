@@ -14,7 +14,9 @@ import { LanguageToggle } from "../components/LanguageToggle";
 
 interface GuestViewProps {
   language: AppLanguage;
+  userId: string;
   onLanguageChange: (language: AppLanguage) => void;
+  onSignOut: () => Promise<void>;
 }
 
 function getExperienceFromUrl() {
@@ -25,7 +27,9 @@ function getExperienceFromUrl() {
 
 export function GuestView({
   language,
+  userId,
   onLanguageChange,
+  onSignOut,
 }: GuestViewProps) {
   const copy = getAppCopy(language);
   const experience = getExperienceFromUrl();
@@ -41,11 +45,19 @@ export function GuestView({
       <div className="min-h-screen bg-brand-floral text-brand-carbon">
         <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-5 sm:px-6">
           <Brand language={language} />
-          <LanguageToggle
-            language={language}
-            onChange={onLanguageChange}
-          />
+          <div className="flex items-center gap-2">
+            <LanguageToggle
+              language={language}
+              onChange={onLanguageChange}
+            />
+            <Button variant="secondary" onClick={onSignOut}>
+              {copy.common.signOut}
+            </Button>
+          </div>
         </header>
+        <p className="mx-auto w-full max-w-5xl px-4 text-sm text-brand-charcoal sm:px-6">
+          {copy.common.signedInAs}: {userId}
+        </p>
         <main className="mx-auto flex w-full max-w-5xl items-center justify-center px-4 py-16 sm:px-6">
           <Card
             className="w-full max-w-xl p-7 text-center sm:p-10"
@@ -80,7 +92,9 @@ export function GuestView({
     <GuestExperience
       experience={experience}
       language={language}
+      userId={userId}
       onLanguageChange={onLanguageChange}
+      onSignOut={onSignOut}
     />
   );
 }

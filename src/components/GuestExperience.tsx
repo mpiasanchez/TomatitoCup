@@ -22,6 +22,7 @@ import {
 } from "../lib/i18n";
 import { HOME_PATH } from "../lib/routes";
 import { LanguageToggle } from "./LanguageToggle";
+import { Button } from "./Button";
 
 interface GuestExperienceProps {
   experience: DateExperience;
@@ -29,7 +30,9 @@ interface GuestExperienceProps {
   onBack?: () => void;
   backLabel?: string;
   language: AppLanguage;
+  userId?: string;
   onLanguageChange: (language: AppLanguage) => void;
+  onSignOut?: () => Promise<void>;
 }
 
 function formatDate(value: string, language: AppLanguage): string {
@@ -74,7 +77,9 @@ export function GuestExperience({
   onBack,
   backLabel,
   language,
+  userId,
   onLanguageChange,
+  onSignOut,
 }: GuestExperienceProps) {
   const copy = getAppCopy(language);
   const [progress, setProgress] = useState(() =>
@@ -162,16 +167,31 @@ export function GuestExperience({
                 {backLabel ?? copy.common.backToCreator}
               </button>
             ) : (
-              <a
-                href={HOME_PATH}
-                className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-semibold text-brand-charcoal hover:text-brand-carbon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-watermelon focus-visible:ring-offset-2 focus-visible:ring-offset-brand-floral"
-              >
-                {copy.common.createYours}
-              </a>
+              <>
+                <a
+                  href={HOME_PATH}
+                  className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-semibold text-brand-charcoal hover:text-brand-carbon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-watermelon focus-visible:ring-offset-2 focus-visible:ring-offset-brand-floral"
+                >
+                  {copy.common.createYours}
+                </a>
+                {onSignOut ? (
+                  <Button
+                    variant="secondary"
+                    onClick={onSignOut}
+                  >
+                    {copy.common.signOut}
+                  </Button>
+                ) : null}
+              </>
             )}
           </div>
         </div>
       </header>
+      {userId ? (
+        <p className="mx-auto w-full max-w-6xl px-4 py-2 text-sm text-brand-charcoal sm:px-6 lg:px-8">
+          {copy.common.signedInAs}: {userId}
+        </p>
+      ) : null}
 
       <main
         id="guest-main"
