@@ -14,6 +14,10 @@ describe("resolveAppRoute", () => {
     expect(resolveAppRoute("/create")).toBe("host");
   });
 
+  it("returns resetPassword for the reset password path", () => {
+    expect(resolveAppRoute("/auth/reset-password")).toBe("resetPassword");
+  });
+
   it("returns home for unknown paths", () => {
     expect(resolveAppRoute("/anything-else")).toBe("home");
   });

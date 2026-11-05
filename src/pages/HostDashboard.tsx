@@ -45,7 +45,9 @@ import { Textarea } from "../components/Textarea";
 interface HostDashboardProps {
   onPreview: (experience: DateExperience) => void;
   language: AppLanguage;
+  userId: string;
   onLanguageChange: (language: AppLanguage) => void;
+  onSignOut: () => Promise<void>;
 }
 
 const EMPTY_DRAFT: HostFormDraft = {
@@ -137,7 +139,9 @@ async function copyToClipboard(value: string): Promise<boolean> {
 export function HostDashboard({
   onPreview,
   language,
+  userId,
   onLanguageChange,
+  onSignOut,
 }: HostDashboardProps) {
   const copy = getAppCopy(language);
   const [draft, setDraft] = useState<HostFormDraft>(() => getHostDraft() ?? EMPTY_DRAFT);
@@ -452,6 +456,9 @@ export function HostDashboard({
                 <p className="mt-1 text-sm text-brand-charcoal">
                   {copy.host.mobileBuilderSubtitle}
                 </p>
+                <p className="mt-1 text-xs text-brand-charcoal">
+                  {copy.common.signedInAs}: {userId}
+                </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <LanguageToggle
@@ -478,6 +485,12 @@ export function HostDashboard({
                   onClick={handleReset}
                 >
                   {copy.host.buttonReset}
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={onSignOut}
+                >
+                  {copy.common.signOut}
                 </Button>
               </div>
             </div>
